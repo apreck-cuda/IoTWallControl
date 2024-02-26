@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <title>GPIO Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+    
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+    
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+    
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+    
+    .slider.round:before {
+      border-radius: 50%;
+    }
+    .myDiv {
+        border: 5px outset red;
+        background-color: lightblue;    
+        text-align: center;
+    }
+    .myINDiv {
+        border: 5px outset green;
+        background-color: lightgreen;    
+        text-align: center;
+    }
+    table, th, td {
+  border: 1px solid black;
+  text-align: center;
+    }
+    .container {
+            display: flex; /* Use flex display to align items */
+        }
+    body {
+  background-color: rgb(18, 47, 56);
+}
+    </style>
+</head>
+
+<body>
+    <h1>SC2 IoT Wall Control</h1>
+    <div class="container">
+    <div class="myDiv">
+    <table>
+        <!-- Slider buttons -->
+        <tr>
+            <th>Control</th>
+            <th>API Call</th>
+            <th>GPIO</th>
+        </tr>
+        <tr>
+            <th>
+                <label class="switch" for="OUT1">
+                    <input type="checkbox" id="OUT1" name="OUT1">
+                    <span class="slider round"></span>
+                </label>
+                <p>Out 1</p>
+            </th>
+            <th>/out1/0 or 1</th>
+            <th>110</th>
+        </tr>
+        <tr>
+            <th>
+                <label class="switch" for="OUT2">
+                    <input type="checkbox" id="OUT2" name="OUT2">
+                    <span class="slider round"></span>
+                    <p>Out 2</p>
+                </label>
+            </th>
+            <th>/out2/0 or 1</th>
+            <th>111</th>
+        </tr>
+        <tr>
+            <th>
+                <label class="switch" for="OUT3">
+                    <input type="checkbox" id="OUT3" name="OUT3">
+                    <span class="slider round"></span>
+                    <p>Out 3</p>
+                </label>
+            </th>
+            <th>/out3/0 or 1</th>
+            <th>112</th>
+        </tr>  
+        <tr>
+            <th>
+                <label class="switch" for="OUT4">
+                    <input type="checkbox" id="OUT4" name="OUT4">
+                    <span class="slider round"></span>
+                    <p>Out 4</p>
+                </label>
+            </th>
+            <th>/out4/0 or 1</th>
+            <th>113</th>
+        </tr>  
+    </table>
+</div>
+   
+    <!-- Add three more slider buttons here as needed -->
+
+    <!-- LEDs -->
+    <div class="myINDiv">
+      <table> 
+        <tr>
+          <th>Control</th>
+          <th>API Call</th>
+          <th>GPIO</th>
+        </tr>
+        <tr>
+          <th>
+            <label for="IN1">Input 1:</label>
+            <input type="checkbox" id="IN1" name="IN" {% if in1bool %}checked{% endif %}>
+          </th>
+          <th>GET /in1/</th>
+          <th>106</th>
+        </tr>
+        <tr>
+          <th>
+            <label for="IN2">Input 2:</label>
+            <input type="checkbox" id="IN2" name="IN" {% if in2bool %}checked{% endif %}>
+          </th>
+          <th>GET /in2/</th>
+          <th>107</th>
+        </tr>
+        <tr>
+          <th>
+            <label for="IN3">Input 3:</label>
+            <input type="checkbox" id="IN3" name="IN"{% if in3bool %}checked{% endif %}>
+          </th>
+          <th>GET /in1/</th>
+          <th>108</th>
+        </tr>
+        <th>
+          <label for="IN4">Input 3:</label>
+          <input type="checkbox" id="IN4" name="IN"{% if in4bool %}checked{% endif %}>
+        </th>
+        <th>GET /in4/</th>
+        <th>109</th>
+      </tr>
+      </table>
+    </div>
+  </div>
+    <!-- Java script for toggling button-->
+
+    <script>
+      $(document).ready(function() {
+          $('#OUT1').change(function() {
+              var state = $(this).prop('checked') ? 1 : 0;
+              $.post('/out1/' + state, function(data) {
+                  console.log(data); // You can handle the response here
+              });
+          });
+      });
+      </script>
+
+    <script>
+       $(document).ready(function() {
+           $('#OUT2').change(function() {
+                var state = $(this).prop('checked') ? 1 : 0;
+               $.post('/out2/' + state, function(data) {
+                   console.log(data); // You can handle the response here
+               });
+            });
+       });
+  </script>
+
+<script>
+  $(document).ready(function() {
+      $('#OUT3').change(function() {
+          var state = $(this).prop('checked') ? 1 : 0;
+          $.post('/out3/' + state, function(data) {
+              console.log(data); // You can handle the response here
+          });
+      });
+  });
+  </script>
+
+<script>
+  $(document).ready(function() {
+      $('#OUT4').change(function() {
+          var state = $(this).prop('checked') ? 1 : 0;
+          $.post('/out4/' + state, function(data) {
+              console.log(data); // You can handle the response here
+          });
+      });
+  });
+  </script>
+</body>
+</html>

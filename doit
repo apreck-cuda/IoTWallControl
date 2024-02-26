@@ -1,0 +1,85 @@
+#!/bin/bash
+######################################################################################
+# """  
+                                                                      # ./*       
+                                                                 # .(###.         
+                                                             # *######            
+                                                         # /########              
+                                                     # ,##########                
+                                                  # (###########                  IOT Wall control Installtion routine 
+              # /                                #(###########.                 
+             # (*                             (#############(                     
+            # ,#,                          ,###############.                      
+            # #/                        (################                        
+           # /###                      ##################                         
+           # ###                    ((################(                          
+          # *####*                 /###################                           
+          # #####                ####################,                           Anton Preck
+          # ######             *#####################                            
+         # .#######/           (######################*                           
+         # *########/         #########################.                          
+         # /#########(       /###########################                         
+         # /###########,    .###############################.                """      
+
+LOG=/var/log/doit_$(date +%y_%m_%d_%H_%M).log
+INSTALL_DIR=/opt/iotcontrol/
+WORK_DIR=$(pwd)
+DEBIAN_FRONTEND=noninteractive
+echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+echo $(date) "Container Installation - Doit script executed" > $LOG
+echo $(date) "Working in: "$(pwd) >> $LOG
+echo $(date) "Copy start script and make it executable" >> $LOG
+
+cp start.sh /root/start.sh  >> $LOG
+chmod +x /root/start.sh >> $LOG
+
+echo $(date) "Copy  components" >> $LOG
+echo $(date) "Creating installation directory: $INSTALL_DIR" >> $LOG
+mkdir $INSTALL_DIR
+
+cp -r $WORK_DIR/* $INSTALL_DIR  >> $LOG
+
+echo $(date) "Make files executible " >> $LOG
+
+chmod +x $INSTALL_DIR >> $LOG
+
+echo $(date) "Executing apt-update.." >> $LOG
+apt-get update -y >> $LOG && apt-get upgrade -y >> $LOG
+
+if [ "$?" -eq "0" ]
+then
+        echo $(date) "Update and Upgrade seccessful proceed with installtion" >> $LOG
+else
+        echo $(date) "Update or Upgrade failed proceed with installtion. System might be outdated" >> $LOG
+fi
+
+echo $(date) "Installing additional debian packages inluding python....." >> $LOG
+
+apt-get install python3.10 -y --allow-unauthenticated >> $LOG && apt-get install python3-pip -y --allow-unauthenticated >> $LOG && apt-get install wget -y --allow-unauthenticated >> $LOG && apt-get install dos2unix -y --allow-unauthenticated >> $LOG && apt-get install vim -y --allow-unauthenticated >> $LOG && apt-get install dnsutils -y --allow-unauthenticated >> $LOG && apt-get install iputils-ping -y --allow-unauthenticated >> $LOG
+
+if [ "$?" -eq "0" ]
+then
+        echo $(date) "Packages installed seccessfully" >> $LOG
+else
+        echo $(date) "Failed to install packages exit Installtion" >> LOG
+fi
+
+echo $(date) "Installing FLASK"
+pip install flask >> $LOG
+
+echo $(date) "Cleaning up..." >> $LOG
+apt-get clean -y >> $LOG
+apt-get autoclean -y >> $LOG
+
+echo $(date) "Sanitizing start.sh " >> $LOG
+
+dos2unix /root/start.sh >> $LOG
+
+#rm -f $INSTALL_DIR/*.tgz 
+
+
+echo $(date) "IOT Control setup finished " >> $LOG
+
+echo $(date)   "=======doit script finished======" >> $LOG
+
